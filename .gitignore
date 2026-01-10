@@ -20,3 +20,5 @@ __pycache__/
 .ipynb_checkpoints/
 */.ipynb_checkpoints/vector_store/
 vector_store_full/
+vector_store/
+vector_store_full/
