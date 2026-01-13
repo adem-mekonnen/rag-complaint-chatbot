@@ -21,12 +21,29 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    # Cache dependencies to speed up runs
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        # Install project requirements first
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # Install testing libraries
         pip install pytest
 
     - name: Run tests with pytest
+      # The "|| true" ensures the workflow doesn't fail red if no tests are found yet.
+      # Remove "|| true" once you have actual tests you want to enforce.
       run: |
-        pytest tests/
+        if [ -d "tests" ] && [ "$(ls -A tests)" ]; then
+          pytest tests/
+        else
+          echo "No tests folder or tests folder is empty. Skipping tests."
+        fi
